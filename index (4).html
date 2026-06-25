@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CollabBoard - Интерактивные доски</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="nav">
+                <div class="logo">🎨 CollabBoard</div>
+                <div class="board-actions">
+                    <button class="action-btn" onclick="saveBoard()">💾 Сохранить</button>
+                    <button class="action-btn" onclick="exportBoard()">📤 Экспорт</button>
+                    <button class="action-btn" onclick="clearDrawings()">🧹 Очистить рисунки</button>
+                    <button class="action-btn" onclick="clearBoard()">🗑️ Очистить всё</button>
+                </div>
+                <div class="user-actions">
+                    <button class="help-btn" onclick="showHelp()">❓ Помощь</button>
+                    <button class="invite-btn" onclick="inviteUsers()">👥 Пригласить</button>
+                    <div class="user-profile">
+                        <div class="avatar">👨‍💻</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="main-container">
+        <!-- Панель инструментов -->
+        <div class="toolbar">
+            <div class="tool-group">
+                <h4>🎯 Инструменты</h4>
+                <button class="tool-btn active" data-tool="pen" onclick="switchTool('pen')">✏️ Карандаш</button>
+                <button class="tool-btn" data-tool="eraser" onclick="switchTool('eraser')">🧽 Ластик</button>
+                <button class="tool-btn" data-tool="select" onclick="switchTool('select')">✋ Выделение</button>
+                <button class="tool-btn" data-tool="text" onclick="addTextElement()">📝 Текст</button>
+            </div>
+            
+            <div class="tool-group">
+                <h4>🎨 Цвета</h4>
+                <div class="color-palette">
+                    <div class="color-option active" style="background: #000000;" data-color="#000000" onclick="selectColor('#000000')"></div>
+                    <div class="color-option" style="background: #ff6b6b;" data-color="#ff6b6b" onclick="selectColor('#ff6b6b')"></div>
+                    <div class="color-option" style="background: #4ecdc4;" data-color="#4ecdc4" onclick="selectColor('#4ecdc4')"></div>
+                    <div class="color-option" style="background: #45b7d1;" data-color="#45b7d1" onclick="selectColor('#45b7d1')"></div>
+                    <div class="color-option" style="background: #96ceb4;" data-color="#96ceb4" onclick="selectColor('#96ceb4')"></div>
+                    <div class="color-option" style="background: #feca57;" data-color="#feca57" onclick="selectColor('#feca57')"></div>
+                    <div class="color-option" style="background: #ff9ff3;" data-color="#ff9ff3" onclick="selectColor('#ff9ff3')"></div>
+                    <div class="color-option" style="background: #54a0ff;" data-color="#54a0ff" onclick="selectColor('#54a0ff')"></div>
+                </div>
+            </div>
+            
+            <div class="tool-group">
+                <h4>📏 Размер кисти</h4>
+                <input type="range" min="1" max="50" value="3" class="size-slider" id="brushSize">
+                <span id="sizeValue">3px</span>
+            </div>
+
+            <div class="tool-group">
+                <h4>⬜ Фигуры</h4>
+                <button class="shape-btn" onclick="addRectangle()">⬜ Прямоугольник</button>
+                <button class="shape-btn" onclick="addCircle()">⭕ Круг</button>
+                <button class="shape-btn" onclick="addLine()">📏 Линия</button>
+            </div>
+            
+            <div class="tool-group">
+                <h4>⏪ История</h4>
+                <button class="action-btn" onclick="undo()">↶ Отменить (Ctrl+Z)</button>
+                <button class="action-btn" onclick="redo()">↷ Повторить (Ctrl+Y)</button>
+            </div>
+
+            <div class="tool-group">
+                <h4>ℹ️ Информация</h4>
+                <div class="info-text">
+                    <p>• Используйте мышь для рисования</p>
+                    <p>• Ластик стирает рисунки</p>
+                    <p>• Горячие клавиши в помощи</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Область доски -->
+        <div class="board-area">
+            <canvas id="drawingCanvas"></canvas>
+            <div class="board" id="drawingBoard">
+                <!-- Элементы доски будут добавляться здесь -->
+                <div class="board-element text-element" style="top: 50px; left: 100px;">
+                    <div class="element-content">Добро пожаловать на интерактивную доску! 🎨</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Боковая панель -->
+        <div class="sidebar">
+            <div class="users-online">
+                <h4>👥 Участники (3)</h4>
+                <div class="user-list">
+                    <div class="user active">
+                        <span class="user-avatar">👨‍💻</span>
+                        <span>Вы (Рисует)</span>
+                    </div>
+                    <div class="user">
+                        <span class="user-avatar">👩‍💼</span>
+                        <span>Анна</span>
+                    </div>
+                    <div class="user">
+                        <span class="user-avatar">👨‍🎨</span>
+                        <span>Петр</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="chat-section">
+                <h4>💬 Чат доски</h4>
+                <div class="chat-messages" id="chatMessages">
+                    <div class="message">
+                        <span class="sender">Система:</span>
+                        <span class="text">Добро пожаловать! Начните рисовать мышью</span>
+                    </div>
+                </div>
+                <div class="chat-input">
+                    <input type="text" placeholder="Введите сообщение..." id="chatInput">
+                    <button class="send-btn" onclick="sendMessage()">📤</button>
+                </div>
+            </div>
+            
+            <div class="templates-section">
+                <h4>📋 Шаблоны</h4>
+                <div class="templates">
+                    <button class="template-btn" onclick="loadTemplate('brainstorm')">🧠 Мозговой штурм</button>
+                    <button class="template-btn" onclick="loadTemplate('project')">📊 План проекта</button>
+                    <button class="template-btn" onclick="loadTemplate('flowchart')">🔀 Блок-схема</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
